@@ -1,0 +1,343 @@
+html,body{-webkit-font-smoothing: subpixel-antialiased!important;}
+
+input::-ms-clear{display: none;}
+
+.image img {
+
+	width: 100%;
+	height: auto!important;
+
+}
+
+.promo a{color: #fff;display: block;position: absolute;top: 0;left: 0;height: 100%;width: 100%;z-index: 60;padding-top:20px;}
+.promo a:hover {color: #fff;text-decoration: none}
+
+.promo a.edit {
+	
+	margin:0.5em;
+	width: auto;
+	height: auto;
+	padding: 0.8em 1em 1em 0.8em;
+	display:block;
+	left:78%;
+	top:10px;
+	
+
+}
+
+/* Nearest selector for more advanced browsers with fallback to non advanced browsers */
+.promo a:hover ~ .edit {
+
+	
+
+}
+.promo a ~ .edit {
+
+	
+
+}
+
+a.edit:hover, 
+a.edit:active {
+
+	opacity:1;
+
+}
+
+a.edit, span.edit a {
+	font-size:0.8em;
+	-webkit-border-radius:0px;
+	border-radius:0px;
+	top:0;
+	z-index: 500;
+	margin:0em 0 1em 0;
+	border:1px solid #850010;
+	white-space: nowrap;
+	overflow: hidden;
+	-webkit-transition:background 0.4s ease-in-out;
+	transition:background 0.4s ease-in-out;
+
+}
+
+a.edit:before, span.edit a:before {
+
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	content:"\e650";
+	padding:0 0.5em 0 0;
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size:0.9em;
+	
+}
+
+/* Stops noclick from interfering with the editor */
+.noclick {
+
+	/*display:none;*/
+
+}
+
+.col-md-12 ~ .edit, 
+.col-md-12 > .edit {
+
+	opacity:1;
+	position:absolute;
+	left:110%;
+	
+
+}
+
+span.edit {
+
+	-webkit-border-radius:0px;
+	border-radius:0px;
+	position:absolute;
+	top:25em;
+	z-index:999;
+	left:95%;
+	opacity:1;
+	
+
+}
+
+/* Weird gray box at right override */
+#content-container section {
+
+	/*overflow:hidden;*/
+
+}
+
+.item > .video > .edit {
+
+	position:absolute;
+	top:9.5em;
+	left:10em;
+	z-index:9999;
+
+}
+
+
+#result-container{-webkit-overflow-scrolling: touch;}
+.search-results-wrapper{max-width: 770px;margin: 0 auto}
+.search-results-wrapper h1 {font-size: 3.5em;margin: 0 0 4px -2px;letter-spacing: -0.04em;text-align: center;}
+.search-results-wrapper .result-count{display: block;text-align: center;}
+.search-result-item a:hover{color: #000}
+.result-url{text-decoration: underline;}
+.result-url:hover{text-decoration: none}
+
+
+/* Carousel Dots */
+.flex-container{font-size: 12px;}
+.flex-container .icon{background-color: rgb(255,255,255);background-color: rgba(255,255,255,.9);color: #000;width: 50px;height: 50px;font-size: 1.5em;
+-webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+border-radius: 30px;
+}
+.flex-container .left .icon{padding: 10px 10px 0 5px;text-shadow: none;}
+.flex-container .right .icon{padding: 10px 10px 0 15px;text-shadow: none;}
+.flex-control-paging{font-size: 12px;}
+#promo-slider .flex-control-paging{top: 195%; cursor:pointer; z-index:9999;pointer-events:all;}
+.flex-control-paging li{overflow: hidden;}
+
+.flex-control-paging li a.flex-active,.flex-control-paging li a.flex-active:hover,.flex-control-paging li a:hover{border: 1px solid #000;background: #fff}
+.flex-control-paging li a {border: 1px solid #fff;background: #000}
+
+.loader{background: #fff url('../images/loader.gif') no-repeat 10px 50%;position: absolute;top: 550px; left:45%;padding: 10px 10px 10px 50px;font-weight: 400}
+.windowLoaded .loader{display: none;}
+
+/* hero social */
+
+.hero-social{overflow: hidden;}
+
+.product-details-page .hero-social{top: 0}
+
+.back-btn{display: block;text-align: left;max-width: 150px;}
+
+.gallery2{overflow: hidden;position: relative;z-index: 500;height: auto;}
+.gallery2 .flex-active-slide .copy{line-height: 1;padding: 0}
+.gallery2 .flex-direction-nav{display: none!important;}
+
+
+#main-nav ul li h3 a{letter-spacing: -0.4px}
+#main-nav .inner-container{max-width: 960px;position: static;}
+#main-nav ul li a span{margin-right: 2px}
+
+#other-products{padding-bottom: 50px}
+
+.product span.othersize{display: inline}
+
+#promoBox{line-height: 0;margin: 0 auto}
+.promo.darkCopy h4,
+.promo.darkCopy h5{text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);color: #000;font-weight: 400;}
+.promo.darkCopy.hover h4,
+.promo.darkCopy.hover h5{text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75)}
+
+.othersize,.product-thumb-view  .name .othersize { display:none; }
+.product-list-view .othersize,.name .othersize { display:block; }
+#product-bank{display: none;}
+
+
+/* gallery */
+
+.gallery2 iframe{z-index: 100}
+.gallery2 .video{z-index: 100}
+.gallery2 .closeBtn{display: none;-webkit-border-radius: 30px;-moz-border-radius: 30px;border-radius: 30px;position: absolute;top: -9px;right: -106px;text-decoration: none;z-index: 900}
+.gallery2 .flex-viewport{height: 400px;}
+.gallery2 .pane-video .copy{margin-top:20px;}
+.scaleVideo {position: relative;overflow: visible;}
+.scaleVideo .noclick{display: none;}
+.scaleVideo .closeBtn,.scaleVideo a.closeBtn:active{display: block;color: #000!important}
+.scaleVideo .pane-video{/*width: 500px!important;max-width: 500px!important;*/position: relative;}
+.scaleVideo .pane-video i {
+	color: #000;
+	background: #fff;
+	border-radius: 60px;
+	padding: 0px;
+	font-size: 1.3em;
+	margin-right: -20px;
+	margin-bottom: 0px;
+	position: absolute;
+	bottom: -29px;
+}
+
+.content .item.scaleVideo .pane-video iframe{/*position: absolute;top: 0;left: 0;*/
+	width: 500px!important;
+	max-width: 500px!important;
+	height: 281px!important;
+	margin-left: -71px!important;
+	margin-top: 10px!important;
+	transform-origin:50% 0;
+	-ms-transform-origin:50% 0; /* IE 9 */
+	-webkit-transform-origin:50% 0; /* Safari and Chrome */
+	-moz-transform-origin:50% 0; /* Firefox */
+	-o-transform-origin:50% 0; /* Opera */
+}
+.scaleVideo .copy{display: none!important}
+
+
+.pane-gallery{position: relative;}
+.pane-gallery .flex-control-nav{bottom: 0px!important; position: relative; clear: both;}
+.pane-gallery .captionfirst{font-weight:700;text-transform: none;position: relative;bottom: 0;margin: 0;background: none;text-transform: normal;border-width:0;line-height: 1;width: 100%;text-align: center;height: auto;}
+.pane-gallery .captionfirst span{margin: 0}
+.pane-gallery .captionfirst a{color: #000;text-decoration: none;}
+.pane-gallery .captionfirst a:hover{color: #bd0017;}
+.copyheader{font-weight: 700}
+
+#mobile-product-nav .nav-item a, #mobile-content-nav .nav-item a{font-size: 0.9em}
+#sideNav{-webkit-overflow-scrolling: touch;} /* this will remove the :active styles */
+.openSearchbar #mobile-product-nav,
+.openSearchbar .product-details-section,
+.openSearchbar #mobile-content-nav{right: 100%;left:auto;}
+.openSidenav #mobile-product-nav,
+.openSidenav .product-details-section,
+.openSidenav #mobile-content-nav{left: 100%;right: auto;}
+
+.openSearchbar #searchBar,
+.openSidenav #sideNav{min-height: 100%;background: #fff}
+
+.openSearchbar #main-nav,
+.openMapPanel.mobile-site #main-nav,
+.openSidenav #main-nav{visibility: hidden;}
+
+.openMapPanel #map-right-panel{right: 0!important}
+
+/* maps */
+#facilities .checks{width: 50%}
+.filter-wrapper{margin-bottom: 20px}
+.map-info .content{padding-bottom: 0}
+
+/* Time visibility. */
+.visible-time-morning, .visible-time-other, .visible-time-afternoon, .visible-time-night {display: none;}
+.time-morning .visible-time-morning { display:block; } 
+.time-afternoon .visible-time-afternoon {display: block;}
+.time-other .visible-time-other {display: block;}
+.time-night .visible-time-night{ display:block; }
+
+/* Weather visibility. */
+.visible-weather-cold, .visible-weather-hot {display: none;}
+.weather-cold .visible-weather-cold {display: block;}
+.weather-hot .visible-weather-hot {display: block;}
+
+
+.mobile-map-content{padding: 0 20px;}
+/*.mobile-map-content .filter-wrapper{background:#fff;padding:10px;margin-bottom: 15px}*/
+#mobile-product-nav .nav-item a, #mobile-content-nav .nav-item a{line-height: 1}
+
+/* Highlight Nav */
+#sideNav .panel-heading.active a span,
+#sideNav .panel-heading.active a .icon,
+#sideNav .panel-inner a.active,
+#sideNav .panel-inner ul li a:active,
+#sideNav .panel-inner li.active a,
+#nav-links li a.active,
+#nav-links .subnav-content ul li.active a{color: #ffc836!important;}
+
+.mobile-site #sideNav .panel a:hover{color: #fff!important}
+.mobile-site #sideNav .panel-inner a:hover{color: #ababab!important;}
+.mobile-site #sideNav .panel-inner a:active{color: #ffc836!important;}
+
+.view-empty{margin: 20px 0}
+.fb-like{margin-right: 5px}
+.fb-share-button{top: -6px;position: relative;margin-right: 5px}
+.footer-social{overflow: hidden;width: 100%;max-width: 100%;text-align: center;display: block;position: relative;}
+.fb-like span,
+.fb-like > span,
+.fb-like > span,
+.fb-like span {
+
+	/*height:25px !important; override for facebooks out of alignment button */
+}
+
+@media (min-width: 320px) and (max-width: 767px) {
+	#hero h1{font-size: 2.5em}
+	.promo{margin-top: 2px;margin-bottom:0}
+	.full-menu-page #hero .item{background-size: 100%;min-height: 400px}
+	#mobile-product-nav #view-toggle{z-index: 1100}
+	.gallery2 .slides{height: 400px!important;}
+	.gallery2 .item img {min-width: 100%;margin: 0 auto;display: block;}
+	/*.gallery2 .flex-viewport[style]{padding: 0;width: auto;height: auto}*/
+	.gallery2{height: auto;}
+	#promo-slider .flex-viewport,#promo-slider .flex-viewport .slides[style]{height: 420px!important}
+	#promo-slider .item{height: 420px}
+	.nav-tabs > li{margin-bottom: -5px;}
+	.nav-tabs > li > a{padding: 10px 8px}
+	.mobile-mapInfo {padding-top: 60px;}
+	.mobile-mapInfo .content{padding-bottom:0;}
+	.searchResults{padding: 0}
+	.searchHeader,.searchResults ul{padding: 15px}
+	.result-kms{right: 39px}
+
+	
+
+}
+@media (min-width: 768px) { 
+	.promo.col-sm-3 {width: 24.9%;}
+}
+@media all and (device-width: 768px) and (device-height: 1024px){
+	.search-nav form{position: relative;}
+	.search-nav button{display: none!important;}
+	.search-nav .social-subnav{left: auto;right: 35px}
+	.findus-nav form{position: relative;}
+	.findus-nav button{display: none!important;}
+	#social-nav li .icon-remove{right: 7px;top:7px;z-index: 300}
+	.findus-nav .social-subnav{left: auto;right: 30px}
+	#findBox, #searchBox{padding-right: 25px;z-index: 100}
+
+}
+
+@media (min-width: 948px) { 
+	.promo.col-sm-3 {width: 24.9%;}
+
+}
+
+
+
+
+

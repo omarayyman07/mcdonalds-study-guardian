@@ -1,0 +1,2151 @@
+(function ($) {
+        var mainbgloaded = false;
+    $(window).load(function () {
+        $('body').addClass('windowLoaded').removeClass('windowLoading');
+    });
+
+    $(document).ready(function () {
+        maccasApp.init();
+        maccasApp.visibilityAction();
+        //if(mql768.matches){
+        maccasApp.mobile();
+        //}
+
+        if (Drupal.settings.maccasapp_id == "promo") {
+            maccasApp.homepage();
+            maccasApp.macpackpage();
+        } else if (Drupal.settings.maccasapp_id == "map") {
+            maccasApp.mappage();
+        } else if (Drupal.settings.maccasapp_id == "product_list") {
+            maccasApp.productpage();
+        } else if (Drupal.settings.maccasapp_id == "product") {
+            maccasApp.productdetailspage();
+        } else {
+            maccasApp.carouselpage();
+            maccasApp.otherpage();
+            maccasApp.macpackpage();
+            maccasApp.contenttabs();
+            maccasApp.junior_sport_application_form();
+        }
+
+        //create your taste page
+        if ($('#parallax-slider').length) {
+            maccasApp.cyt();
+        }
+        $("#searchDesktop").submit(function () {
+            if ($('#searchBox').val().length >= 3) {
+                //_gaq.push(['_trackEvent', 'Page', 'Search', $('#searchBox').val()]);
+            } else {
+                return false;
+            }
+        });
+
+        var sid = getParameterByName('sid');
+        if (sid.length > 0) {
+            scrollToElement("#form-thank-you");
+        }
+
+        $('a').each(function () {
+            var a = new RegExp('/' + window.location.host + '/');
+            if (this.href != '' && !a.test(this.href)) {
+                $(this).click(function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.open(this.href, '_blank');
+                });
+            }
+        });
+    });
+
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    function scrollToElement(selector, time, verticalOffset) {
+        time = typeof (time) != 'undefined' ? time : 1000;
+        verticalOffset = typeof (verticalOffset) != 'undefined' ? verticalOffset : 0;
+        element = $(selector);
+        if (element.length) {
+            offset = element.offset();
+            offsetTop = offset.top + verticalOffset;
+            $('html, body').animate({
+                scrollTop: offsetTop
+            }, time);
+        }
+    }
+
+    /////////////////////////////////////////////////////////
+    //
+    // MACCAS APP
+    //
+    /////////////////////////////////////////////////////////
+
+    var $container = $('#product-list'),
+        mql = window.matchMedia('only screen and (min-width: 320px) and (max-width: 767px)'),
+        mql600 = window.matchMedia('only screen and (max-width: 600px)'),
+        mql768 = window.matchMedia('only screen and (max-width: 768px)'),
+        mqlMin768 = window.matchMedia('only screen and (min-width: 768px)'),
+        mql800 = window.matchMedia('only screen and (max-width: 800px)'),
+        mqlO = window.matchMedia('(orientation: portrait)'),
+        timer,
+        $html = $('html'),
+        $productBank = $('#product-bank'),
+        $othersize = $('.product.othersize'),
+        maccasApp = {
+
+            /* ------------------ */
+            // MACCASAPP.INIT
+            /* ------------------ */
+
+
+            init: function () {
+                // document.addEventListener("touchstart", function(){}, true);
+                $('body').addClass('windowLoading');
+                if (!$('.touch').length > 0) {
+                    //hover main-nav
+                    $('#main-nav ul li').hover(
+                        function () {
+                            $(this).addClass('hover');
+                        },
+                        function () {
+                            $(this).removeClass('hover');
+                        }
+                    );
+                    //hover subnav
+                    $('.subnav', '#main-nav').hover(
+                        function () {
+                            $(this).parents('li').addClass('hover');
+                        },
+                        function () {
+                            $(this).parents('li').removeClass('hover');
+                        }
+                    );
+
+                } //touch
+
+                //Touchevent main-nav
+                $('#main-nav ul#nav-links li.main > a').bind('touchstart', function (e) {
+                    e.preventDefault();
+
+                    if ($(this).parent().hasClass("hover")) {
+                        $(this).parent().removeClass('hover');
+                        $('#main-nav ul#nav-links li.main a').not(this).parent().removeClass('hover');
+                    } else {
+                        $(this).parent().addClass('hover');
+                        $('#main-nav ul#nav-links li.main a').not(this).parent().removeClass('hover');
+                    }
+                });
+
+                //active
+                $('#main-nav ul li a').click(function () {
+                    $('#main-nav ul li.active').removeClass('active');
+                    $(this).parents('li').addClass('active');
+                });
+
+                //Video header//
+                if ($('.video1').length) {
+                    videojs('vid1', {}).ready(function () {
+                        var myPlayer = this,
+                            playBtn = $('.playbtn'),
+                            muteBtn = $('.mutebtn');
+                        //myPlayer.muted(true);
+
+                        $('.playbtn').on('click touch', function () {
+                            if (myPlayer.paused() == false) {
+                                playBtn.addClass('paused');
+                                myPlayer.pause();
+                            } else {
+                                playBtn.removeClass('paused');
+                                myPlayer.play();
+
+                            }
+                        });
+
+                        $('.mutebtn').on('click touch', function () {
+
+                            if (myPlayer.muted() == false) {
+                                myPlayer.muted(true);
+                                muteBtn.removeClass('non-mute');
+
+                            } else {
+                                myPlayer.muted(false);
+                                muteBtn.addClass('non-mute');
+                            }
+                        });
+                    });
+                }
+
+
+
+                //End Video Header //
+
+
+                //AFL Deep links
+                if (mql.matches) {
+                    $("a[href*='/littlewins%3A']").each(function () {
+                        var el = $(this);
+                        var href = el.attr("href").replace("/littlewins%3A", "littlewins:");
+                        el.attr("href", "#");
+                        el.click(function (e) {
+                            setTimeout(function () {
+                                // check ios/android
+                                if (isMobile.Android()) {
+                                    window.location = "//play.google.com/store/apps/details?id=au.com.mcdonalds.littlewins";
+                                }
+                                else {
+                                    window.location = "//itunes.apple.com/au/app/id1109200629?mt=8";
+                                }
+                            }, 200);
+
+                            // once you do the custom-uri, it should properly execute the handler, otherwise, the settimeout that you set before will kick in
+                            window.location = href;
+
+                            e.preventDefault();
+                            return false;
+                        });
+                    });
+                }
+
+
+                //Accordion
+                $(document).on('click', '.accordion .question', function () {
+
+                    if ($(this).hasClass("opened")) {
+                        $('.question').removeClass("opened")
+                        $('.answer').slideUp();
+                    }
+                    else {
+                        $('.answer').slideUp();
+                        $('.question').removeClass("opened")
+                        $(this).addClass("opened");
+                    }
+
+                    if (!$(this).hasClass("opened")) {
+                        $('.answer').slideUp();
+                    }
+                    else {
+                        $(this).siblings().slideToggle(150, function () {
+                        });
+                    }
+
+                });
+
+                //social-nav 
+                $('#social-nav .icon').on('click', (function (event) {
+
+                    $('#social-nav li.active-social').removeClass('active-social');
+                    $(this).parents('li').addClass('active-social');
+                    // $('.touch .active-social input').focus();
+                    if (!ie) {
+                        $('.active-social input').focus().val('');
+                    }
+                    var par = $(this).parents('.active-social');
+                    //collapse expanded
+                    if (par.attr('data-expand') && par.hasClass('active-social')) {
+
+                        if ($html.hasClass('ie7')) {
+                            //NO TRANSFORMS
+                        } else {
+                            TweenMax.to(par, .5, {
+                                width: '196',
+                                ease: Back.easeOut,
+                                easeParams: [1]
+                            });
+                        }
+
+                        $('#social-nav li').not('.active-social').each(function () {
+                            if ($(this).hasAttr('data-width')) {
+                                var parWidth = $(this).attr('data-width');
+
+                                if ($html.hasClass('ie7')) {
+                                    //NO TRANSFORMS
+                                } else {
+                                    TweenMax.to($(this), .5, {
+                                        width: parWidth
+                                    });
+                                }
+                            }
+                        });
+
+                        if ($html.hasClass('ie7')) {
+                            //NO TRANSFORMS
+                        } else {
+                            TweenMax.to(par.parent(), .5, {
+                                width: "470",
+                                ease: Back.easeOut,
+                                easeParams: [1]
+                            });
+                        }
+
+                        if (mql768.matches) {
+                            // TweenMax.to($('#nav-links'),.5,{marginLeft:'10px',ease:Back.easeOut,easeParams:[1]});
+                            TweenMax.to($('#nav-links'), .5, {
+                                marginLeft: '0px',
+                                ease: Back.easeOut,
+                                easeParams: [1]
+                            });
+                        } else {
+                            TweenMax.to($('#nav-links'), .5, {
+                                marginLeft: '35px',
+                                ease: Back.easeOut,
+                                easeParams: [1]
+                            });
+                        }
+
+                        $('#nav-links').addClass('shifted');
+                    }
+                    return false;
+                }));
+
+                // if(!ie){
+                $('#social-nav li input:text').on('keyup', function () {
+                    $(this).next('.icon-remove').fadeIn();
+                    //Input Cancel 
+                    $('.icon-remove').on('click', function () {
+                        $(this).prev('input:text').val('');
+                        $(this).fadeOut();
+                    });
+                });
+                // }
+
+                //DOCUMENT CLICK
+                $(document).on('click', function (event) {
+                    if ($(event.target).parents().index($('#social-nav')) == -1) {
+                        blurSocial();
+                    }
+                });
+
+                /* TOOLTIP */
+                $('.social-subnav .icon').tooltip();
+
+
+                /* PLACEHOLDER FIX - FOR IE ONLY - Sarah edits 10/7/15 */
+                if ($('html.ie8').length) {
+                    $('[placeholder]').focus(function () {
+                        var input = $(this);
+                        if (input.val() == input.attr('placeholder')) {
+                            input.val('');
+                            input.removeClass('placeholder');
+                        }
+                    }).blur(function () {
+                        var input = $(this);
+                        if (input.val() == '' || input.val() == input.attr('placeholder')) {
+                            input.addClass('placeholder');
+                            input.val(input.attr('placeholder'));
+                        }
+                    }).blur().parents('form').submit(function () {
+                        $(this).find('[placeholder]').each(function () {
+                            var input = $(this);
+                            if (input.val() == input.attr('placeholder')) {
+                                input.val('');
+                            }
+                        })
+                    });
+                }
+
+                //mcdelivery & create your taste forms
+                //fancy checkboxes
+                $('.page-id-gourmet-burgers, .mcdelivery').find('input[type="checkbox"]').change(function () {
+                    var $label = $('label[for="' + this.id + '"]');
+                    if ($(this).is(':checked')) {
+                        $label.removeClass('iserror')
+                        $label.addClass('ischecked');
+                    }
+                    else {
+                        $label.removeClass('ischecked');
+                    }
+                });
+                //default checked for first checkbox
+                $('.mcdelivery #edit-submitted-delivery-optin-1').attr('checked', 'checked').change();
+                $('.page-id-gourmet-burgers #edit-submitted-proximity-optin-1').attr('checked', 'checked').change();
+
+                $(document).ready(function () {
+                    //form scroll
+                    if (Drupal.settings.mcd.posted_form_id != undefined) {
+                        var formid = $('#' + Drupal.settings.mcd.posted_form_id);
+                        var target = $('.webform-client-form').parents('.pane-webform');
+
+                        function scrollToForm(ele) {
+                            if (mql.matches) {
+                                var navHeight = $('#main-nav').height();
+                                var mobileNavHeight = $('#mobile-content-nav').height();
+                                var formTop = ele.offset().top - navHeight - mobileNavHeight;
+                                console.log(formTop);
+                                $(window).scrollTop(formTop)
+                            }
+                            else {
+                                $(window).scrollTop(ele.offset().top);
+                            }
+                        }
+
+                        if (formid.hasClass('webform-client-form')) {
+                            scrollToForm(target);
+                        }
+                    }
+                    //if forms successful, show thankyou message
+                    if (location.search.search("success=1") != -1) { $('#webform-component-success').show(); }
+                    else { $('#webform-component-success').hide(); }
+
+                    //error states on checkboxes
+                    $('.page-id-gourmet-burgers, .mcdelivery').find('input[type="checkbox"]').each(function () {
+                        if ($(this).hasClass('error')) {
+                            $('label[for="' + this.id + '"]').addClass('iserror');
+                        }
+                    });
+                    $('.pane-iframe iframe').parents('body').addClass('iframe');
+                    $('body.iframe').find('#wrapper, #wrapper>.row-fluid, section.col-12, .node, div.content, .pane-iframe, .pane-iframe>.col-md-12').css({ height: '100%' });
+
+
+                });
+
+
+
+
+                if (!mql768.matches) {
+                    $('.mcdelivery .multi').each(function () {
+                        $(this).find('>.multicolumn-section>.thumbcontainer.twocol').equalHeights();
+                        //$(this).find('.view-mcdelivery-search ul li .listing-inner').equalHeights();
+                    });
+                }
+
+
+
+                //making tab sticky
+                if (!mql.matches) {
+                    $('.mcdelivery-tab').sticky({
+                        topSpacing: 60,
+                        wrapperClassName: 'mcdeliverytab-wrapper'
+                    });
+                }
+                else {
+                    $('.mcdelivery-tab').sticky({
+                        topSpacing: 50,
+                        wrapperClassName: 'mcdeliverytab-wrapper'
+                    });
+                }
+                //code to deal with the external links on touch devices
+                $('.promo').find('a').on('touchstart', function (event) {
+
+                    var external = $(this).attr('target') == '_blank' ? true : false;
+                    if (external) {
+
+                        $(this).removeAttr('target');
+
+                    }
+                });
+                //end
+
+                $(document).not('.promo a').on('touchstart click', 'a', function (event) {
+
+
+                    var href = $(this).attr("href");
+
+                    if (href != undefined && isExternal(href)) {
+
+
+                        window.open(href, '_blank');
+                        return false;
+                    }
+                });
+
+                function isExternal(url) {
+                    if (url != undefined && url.indexOf("javascript") != -1) return false;
+                    var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+                    if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
+                    if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + {
+                        "http:": 80,
+                        "https:": 443
+                    }[location.protocol] + ")?$"), "") !== location.host) return true;
+                    return false;
+                }
+
+                /* Multicolumn fixes */
+                /* count thumbcontainers */
+                $(".multi").find(".thumbcontainer:even").addClass("leftcol");
+                $(".multi").find(".thumbcontainer:odd").addClass("rightcol");
+                //Hide the edit button if no text inside
+                $("span.edit:empty").hide();
+
+
+
+                $(window).load(function () {
+                    // Contact form fixes 
+                    $('#webform-component-last-name').after('<div class="clearfix"></div>');
+                    $('#webform-component-postcode').after('<div class="clearfix"></div>');
+                    $('#webform-component-contact-number').after('<div class="clearfix"></div>');
+                    $('#webform-component-email').after('<div class="clearfix"></div>');
+                    $('#webform-component-alternative-contact-number').after('<div class="clearfix"></div>');
+
+                    // Not found page fix 
+                    $('#column_content-247').after('<div class="clearfix"></div><hr />');
+                    $('#column_content-279').after('<div class="clearfix"></div><hr />');
+                });
+
+                // Equal Heights on page load for columned content
+                function checkWidth(width) {
+                    var windowsize = $(window).width();
+                    $('.twocol, .threecol, .fourcol, fivecol').removeClass('eqh').css('height', 'auto');
+
+                    if (windowsize <= width) {
+                        $(".twocol").removeClass('eqh').css("height", "auto");
+                        $(".threecol").removeClass('eqh').css("height", "auto");
+                        $(".fourcol").removeClass('eqh').css("height", "auto");
+                        $(".fivecol").removeClass('eqh').css("height", "auto");
+                    } else {
+                        $(".twocol").addClass("eqh");
+                        $(".threecol").addClass("eqh");
+                        $(".fourcol").addClass("eqh");
+                        $(".fivecol").addClass("eqh");
+                        $(".notfound").find('.eqh').removeClass("eqh");
+                        $('.eqh').not('.mymaccasPage .thumbcontainer.eqh').equalHeights();
+
+                    }
+                    $('.eqh').equalHeights();
+                }
+
+                $(window).load(function () {
+                    if (!($('.fluid-width').length)) { checkWidth(506); }
+                    else { checkWidth(767) }
+                });
+
+
+                // Smartresize - throttled - to detect browser resize
+
+                $(window).on("throttledresize", function () {
+                    if (!($('.fluid-width').length)) { checkWidth(506); }
+                    else { checkWidth(767) }
+                });
+
+
+                //var mql = window.matchMedia('only screen and (max-width: 768px)');
+                if (mql768.matches) {
+                    //SOCIAL NAV BLUR
+                    $('#social-nav input:text').blur(function () {
+                        blurSocial();
+                    });
+
+
+                } //matchmedia
+
+                function blurSocial() {
+                    var par = $('.active-social');
+                    parWidth = par.attr('data-width');
+
+                    //collapse the social nav
+                    if ($html.hasClass('ie7')) {
+                        //NO TRANSFORMS
+                        TweenMax.to($('#nav-links.shifted'), .5, {
+                            marginLeft: '14%'
+                        });
+                    } else {
+                        TweenMax.to(par, .5, {
+                            width: parWidth
+                        });
+                        TweenMax.to($('#social-nav'), .5, {
+                            width: '270'
+                        });
+                        TweenMax.to($('#nav-links.shifted'), .5, {
+                            marginLeft: '14%',
+                            ease: Back.easeOut,
+                            easeParams: [1]
+                        });
+                    }
+                    $('#nav-links').removeClass('shifted');
+                    $('.active-social').removeClass('active-social');
+
+
+                }
+
+                if (mql.matches) {
+                    /*Detects operating system of phone */
+                    var isMobile = {
+                        Android: function () {
+                            return navigator.userAgent.match(/Android/i);
+                        },
+                        iOS: function () {
+                            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+                        }
+                    };
+                    if (isMobile.Android()) {
+                        $('.appbtn#appstore').remove();
+                    } else if (isMobile.iOS()) {
+                        $('.appbtn#googleplay').remove();
+                    };
+                }
+
+                // anchors for minions
+                if ($('.page-id-minions-at-maccas').length) {
+                    $("body").scrollTop($("a[name='social']").position().top);
+                }
+            }, //maccasApp.init
+
+
+
+            /* ------------------ */
+            // MACCASAPP.HOMEPAGE
+            /* ------------------ */
+
+            homepage: function () {
+                if (!$('.touch').length > 0) {
+                    //promo hover
+                    $('.promo').prepend('<div class="trans"></div>');
+                    $('.promo').hover(
+                        function () {
+                            $(this).addClass('hover');
+                        },
+                        function () {
+                            $(this).removeClass('hover');
+                            //$('.trans',this).remove('.trans');
+                        }
+                    );
+                } //touch
+
+                // var mql = window.matchMedia('only screen and (max-device-width: 768px)');
+                // if (mql.matches) {
+                //   alert('match');
+                // }
+
+                //PROMOSLIDER
+                $('#promo-slider').flexslider({
+                    animation: "slide",
+                    slideshow: true,
+                    slideshowSpeed: 5000,
+                    useCSS: true,
+                    controlsContainer: ".flex-container",
+                    pauseOnHover: true,
+
+                    start: function (slider) {
+                        if (!mql.matches) {
+                            TweenMax.from($('.left,.right'), 1, {
+                                opacity: '1',
+                                delay: 4
+                            });
+                        }
+                        $('.flex-container .right').click(function (event) {
+                            slider.flexAnimate(slider.getTarget("next"));
+                        });
+
+                        $('.flex-container .left').click(function (event) {
+                            slider.flexAnimate(slider.getTarget("prev"));
+                        });
+
+                    }
+                });
+            }, //maccasApp.homepage
+
+
+
+            /* ------------------ */
+            // MACCASAPP.MACPACK PAGE
+            /* ------------------ */
+
+            macpackpage: function () {
+
+
+
+                if (!$.cookie("teabagCookie")) {
+
+                    // console.log(cookieValue);
+                    // $('#teabag').css({display:'block'});
+                    if (ie < 8) {
+                        $('#teabag').css({
+                            display: 'block'
+                        });
+                    }
+
+                    var tl = new TimelineMax();
+                    tl.to($('#teabag'), 0, {
+                        transformOrigin: '50% 0',
+                        top: -14
+                    });
+                    tl.fromTo($('#teabag'), 4, {
+                        rotation: -180,
+                        autoAlpha: 0
+                    }, {
+                            rotation: -180,
+                            autoAlpha: 1
+                        });
+                    tl.to($('#teabag'), 0.2, {
+                        rotation: -30
+                    });
+                    tl.to($('#teabag'), 0.2, {
+                        rotation: 30
+                    });
+                    tl.to($('#teabag'), 2, {
+                        rotation: 0,
+                        ease: Elastic.easeOut
+                    });
+
+                }
+
+
+
+                $(window).load(function () {
+
+
+                    $(".ok-btn").click(function () {
+                        var tl2 = new TimelineMax();
+
+                        tl2.to($('#teabag'), 1, {
+                            rotation: -140,
+                            ease: Elastic.easeOut
+                        });
+                        tl2.to($('#teabag'), .2, {
+                            opacity: 0
+                        });
+                        if (!$.cookie("teabagCookie")) {
+                            $.cookie('teabagCookie', '1', {
+                                expires: 365,
+                                path: '/'
+                            });
+                        }
+                    });
+
+                    $(".macpack-socialfeed").loadmoreitem({
+                        sliceNum: 8,
+                        itemClass: '.fbfeed',
+                        moreButtonClass: '.morefeed',
+                        replacementMoreButton: ".gotofb",
+                        windowSize: mql600,
+                        useIsotope: true
+                    });
+
+                    $('#blueimp-gallery').on('slideend', function (event, index, slide) {
+                        var imgSrc = $("img", slide).attr("src");
+                        $(".download").attr({
+                            "download": imgSrc,
+                            "href": imgSrc
+                        });
+                    })
+
+                });
+            },
+
+
+            /* ------------------ */
+            // MACCASAPP.OTHER PAGE
+            /* ------------------ */
+
+            otherpage: function () {
+                $(window).on('load', function () {
+                    $('#video-selection').change(function () {
+                        var selectedItem = $(this).val(),
+                            itemDiv = $('#' + selectedItem);
+                        $('.item').hide();
+                        itemDiv.fadeIn('slow');
+                    });
+
+                    $('.selectpicker').selectpicker();
+
+                    $(".gallery-macpack").loadmoreitem({
+                        sliceNum: 8,
+                        itemClass: '.pane-image',
+                        moreButtonClass: '.gallery-load-more',
+                        windowSize: mql600,
+                        useIsotope: false
+                    });
+
+
+                    //fancybox for journey
+                    $('.icon-item').off().fancybox({
+                        type: 'inline',
+                        fitToView: true,
+                        aspectRatio: true,
+                        centerOnScroll: true,
+                        padding: 0,
+                        helpers: {
+                            overlay: {
+                                locked: false
+                            }
+                        }
+                    });
+
+
+                    if ($('#page-content').hasClass('page-id-maccas-journey')) {
+
+                        $(window).scroll(function () {
+                            $('#sugar').each(function () {
+                                var imagePos = $(this).offset().top;
+
+                                var topOfWindow = $(window).scrollTop();
+                                if (imagePos < topOfWindow + 800) {
+                                    $(this).addClass("expandOpen");
+                                }
+                            });
+                        });
+
+
+                        $('#vid-placeholder').click(function () {
+
+
+
+
+                            $(function () {
+
+
+                                var $allVideos = $("iframe[src^='//www.youtube.com'], object, embed"),
+                                    $fluidEl = $("figure");
+
+                                $allVideos.each(function () {
+                                    $(this)
+                                        .attr('data-aspectRatio', this.height / this.width)
+                                        .removeAttr('height')
+                                        .removeAttr('width');
+
+                                });
+
+
+                                var firstIframe = document.querySelector('iframe[src^="//www.youtube"]');
+                                var src = firstIframe.src;
+                                var newSrc = src + '?autoplay=1';
+                                firstIframe.src = newSrc;
+
+                                $(window).resize(function () {
+                                    var newWidth = $fluidEl.width();
+                                    $allVideos.each(function () {
+
+                                        var $el = $(this);
+                                        $el
+                                            .width(newWidth)
+                                            .height(newWidth * $el.attr('data-aspectRatio'));
+
+                                    });
+
+                                }).resize();
+
+
+
+                            });
+
+                        });
+
+                        //       
+
+
+
+
+                        $('.cta-text').hover(function () {
+                            $(this).find(".cta-arrow").toggleClass("slideRight");
+
+
+
+                        });
+
+
+                        $('.cta-text').click(function () {
+
+                            setTimeout(function () {
+                                $(".fancybox-skin").css("background-color", "transparent");
+                                $(".fancybox-skin").css("box-shadow", "none");
+
+                            }, 50)
+
+                        })
+
+
+                    }
+
+
+
+
+                    //fancybox for videos
+                    $('a.thumb.youtube-thumb').off().fancybox({
+                        type: 'iframe',
+                        width: 640,
+                        height: 409,
+                        fitToView: true,
+                        aspectRatio: true,
+                        helpers: {
+                            overlay: {
+                                locked: false
+                            }
+                        }
+                    });
+
+
+
+                });
+                if ($('.page-id-mcdelivery').length) {
+
+                    $('#edit-field-mcdelivery-coverage-value').keypress(function (e) {
+                        if (e.keyCode == 13) {
+                            e.preventDefault();
+                            $('#edit-submit-mcdelivery-search').trigger('click');
+                        }
+                    });
+                    $(document).on('ready ajaxComplete', function () {
+
+                        // back to top button for long pages
+                        if ($(this).height() > 1024) {
+                            $('#wrapper').append('<a class="btt-tab"><span class="icon icon-icon-angle-up"></span></a>');
+                            $("#wrapper").css({ position: 'relative' });
+                            $('.btt-tab').on('click', function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                scrollToElement('body', 300);
+                            });
+                        }
+                        //mcdelivery search filter
+                        $('.mcdelivery #edit-field-mcdelivery-coverage-value').attr('placeholder', 'Enter suburb').addClass('placeholder');
+
+
+
+
+                        // hide faqs pane if shown
+                        if ($('.mcdelivery .mcdelivery-faqs').is(':visible')) {
+                            $('.mcdelivery .mcdelivery-faqs, .mcdelivery .pane-separator').hide();
+                        }
+                        // show faqs pane
+                        $('.mcdelivery .view-mcdelivery-search .view-header a').click(function (e) {
+                            e.preventDefault();
+                            $('.mcdelivery .mcdelivery-faqs, .mcdelivery .pane-separator').toggle();
+                            scrollToElement('.mcdelivery-faqs .anchor', 300);
+
+                        });
+
+
+                        //equal heights
+                        if (!mql.matches) {
+                            $('.mcdelivery li.ro-store .accordion-content').each(function () {
+                                $(this).find('.eql').equalHeights();
+                            });
+                            //$('.mcdelivery li.ro-store .listing-inner').equalHeights();
+                        }
+                        //mobile accordion
+                        if (mql.matches) {
+                            $('.mcdelivery .view-mcdelivery-search .accordion-content').addClass('collapse');
+                            $('.mcdelivery .view-mcdelivery-search li:first-child').find('.accordion-content').addClass('in');
+                            $('.mcdelivery .view-mcdelivery-search li:first-child').find('.accordion-header').addClass('active');
+                            $('.mcdelivery .view-mcdelivery-search .accordion-header').click(function () {
+                                accHeader = $(this);
+                                accHeader.parents('li').siblings().find('.accordion-header.active').removeClass('active');
+                                accHeader.toggleClass('active');
+                                $('.in').collapse('hide');
+                                accHeader.next('.accordion-content').collapse('toggle').on('shown.bs.collapse', function () {
+                                    var anchor = accHeader.parent();
+                                    scrollToElement(anchor, 300, -50);
+                                });
+                            });
+
+                        }
+                    });
+                    $(document).on('ajaxComplete', function () {
+                        scrollToElement('.view-mcdelivery-search .view-content, .mcdelivery .mcdelivery-copy', 300, -50)
+                    });
+                }
+            },
+
+
+
+            /* ------------------ */
+            // MACCASAPP.PRODUCT PAGE
+            /* ------------------ */
+
+            productpage: function () {
+                if (!$('.touch').length > 0) {
+                    $('.product').hover(
+                        function () {
+                            $(this).addClass('hover');
+                        },
+                        function () {
+                            $(this).removeClass('hover');
+                        }
+                    );
+                } //touch
+
+                //store othersize
+                storeOthersize();
+
+                $(window).load(function () {
+                    $(".product").equalHeights();
+                    $(".product .thumbnail").equalHeights();
+                    $('#product-list').css({
+                        opacity: 1,
+                        transition: 'opacity 2s'
+                    });
+
+                    $container.isotope({
+                        resizable: false,
+                        masonry: {
+                            columnWidth: $container.width() / 6
+                        }
+                    });
+
+                    // move hero slider
+                    $('.main-product-nav a').click(function () {
+                        var myEq = $(this).parent('li').index();
+                        moveHeroSlider(myEq);
+                        return true;
+                    });
+
+                    // update columnWidth on window resize
+                    $(window).smartresize(function () {
+                        $container.isotope({
+                            // update columnWidth to a percentage of container width
+                            masonry: {
+                                columnWidth: $container.width() / 6
+                            }
+                        });
+                    });
+                }); //window.load
+
+                $('.main-product-nav li a').click(function () {
+
+                    $('.main-product-nav li a').removeClass('active');
+                    $(this).addClass('active');
+                    return true;
+
+                });
+
+                $('.full-menu-page #hero').flexslider({
+                    animation: "fade",
+                    slideshow: false,
+                    useCSS: false,
+                    touch: false,
+                    pauseOnHover: true,
+
+                    start: function (slider) {
+                        moveHeroSlider(Drupal.settings.slideno);
+                        processHeroSlider(Drupal.settings.slideno);
+                    },
+                    before: function (slider) {
+
+                        var nextSlide = slider.animatingTo;
+                        processHeroSlider(nextSlide);
+                    }
+                });
+
+                $('#mobile-product-nav').flexslider({
+                    animation: "slide",
+                    slideshow: false,
+                    useCSS: false,
+                    minItems: 3,
+                    maxItems: 3,
+                    move: 1,
+                    itemWidth: 170,
+                    start: function (slider) {
+                        //var indexslide = $('.slides a').index($('.slides a.active')) - 1;
+                        //slider.currentSlide = indexslide;
+                    },
+                    before: function (slider) {
+                        var nextSlide = slider.animatingTo;
+                        moveHeroSlider(nextSlide);
+                    },
+                    after: function (slider) { }
+
+                });
+
+                $('#mobile-product-nav-container a.product-prev').on('click', function () {
+                     $('#mobile-product-nav').flexslider("prev");
+                    return false;
+                });
+                $('#mobile-product-nav-container a.product-next').on('click', function () {
+                    $('#mobile-product-nav').flexslider("next");
+                    return false;
+                });
+
+                //$('#mobile-product-nav a').click(function () {
+                //    return false;
+                //});
+
+                // list view 
+                $('.view-list').click(function () {
+                    clearTimeout(timer);
+                    $('.name').css({
+                        opacity: 0
+                    });
+                    $('#product-list').removeClass('product-thumb-view');
+                    $('#product-list').addClass('product-list-view');
+                    $('.product-table-header').slideDown();
+                    $('#view-toggle .active').removeClass('active');
+                    $('.view-list').addClass('active');
+
+                    //Store attribute and relayout
+                    $('.product,.product .thumbnail').storeAttr({
+                        attribute: 'height',
+                        data: 'data-height',
+                        callback: function () {
+                            addOthersize();
+                            $container.isotope('reLayout');
+                            timer = setTimeout(function () {
+                                $container.isotope('reLayout', function () {
+                                    $('.name').css({
+                                        opacity: 1
+                                    })
+                                })
+                            }, 200);
+                        }
+                    });
+
+                    return false;
+                });
+
+                $('.view-thumbnail').click(function () {
+                    clearTimeout(timer);
+                    $('.name').css({
+                        opacity: 0
+                    });
+                    $('.product-table-header').slideUp();
+                    $('#product-list').removeClass('product-list-view');
+                    $('#product-list').addClass('product-thumb-view');
+                    $('#view-toggle .active').removeClass('active');
+                    $('.view-thumbnail').addClass('active');
+
+                    //get attributes and relayout
+                    $('.product,.product .thumbnail').getAttr({
+                        attribute: 'height',
+                        data: 'data-height',
+                        callback: function () {
+                            storeOthersize();
+                            removeOthersize();
+                            $container.isotope('reLayout');
+                            timer = setTimeout(function () {
+                                $(".product").equalHeights();
+                                $(".product .thumbnail").equalHeights();
+                                $container.isotope('reLayout', function () {
+                                    $('.name').css({
+                                        opacity: 1
+                                    })
+                                });
+                            }, 200);
+                        }
+
+                    });
+                    return false;
+                });
+
+                //STICKY
+                if (mql768.matches) {
+                    $('#mobile-product-nav').sticky({
+                        topSpacing: 53,
+                        wrapperClassName: 'sticky-wrapper visible-xs'
+                    });
+                } else if (mqlMin768.matches) {
+                    $('#product-nav').sticky({
+                        topSpacing: 53,
+                        wrapperClassName: 'sticky-wrapper hidden-xs'
+                    });
+                }
+
+                //store othersize
+                function storeOthersize() {
+                    $othersize.appendTo($productBank);
+                }
+
+                //remove othersize
+                function removeOthersize() {
+                    $container.isotope('remove', $othersize, function () {
+                        $container.isotope('reLayout');
+                    });
+                };
+
+                //add othersize
+                function addOthersize() {
+                    $container.isotope('insert', $othersize);
+                };
+
+                //filter
+                function processHeroSlider(myslide) {
+                    var $myHero = $('.full-menu-page #hero .item'),
+                        dataFilter = $myHero.eq(myslide).attr('data-filter'),
+                        dataBgImg = $myHero.eq(myslide).attr('data-bg-image'),
+                        dataBgImgMobile = $myHero.eq(myslide).attr('data-bg-image-mobile'),
+                        dataUrl = $myHero.eq(myslide).attr('data-url'),
+                        myBgImg = (mql.matches) ? dataBgImgMobile : dataBgImg;
+
+                    $myHero.putBgImg(myBgImg);
+                    filterProducts(dataFilter, dataUrl);
+                    // console.log(myBgImg);
+                }
+
+                function moveHeroSlider(goingTo) {
+                    if (mainbgloaded == false){
+                        $('.full-menu-page #hero').flexslider(goingTo);
+                        mainbgloaded = true;
+                        var indexslide = $('.slides a').index($('.slides a.active'))-1;
+                        moveNavSlider(indexslide);
+                    }
+                }
+
+                function moveNavSlider(goingTo) {
+                    $('#mobile-product-nav').flexslider(goingTo);
+                }
+
+                function getSortDataItems() {
+                    sortData = {};
+                    var sortField;
+                    $.each(Drupal.settings.product_sort_tids, function (i, item) {
+                        sortData['datasort' + item] = getSortDataCallback('data-sort-' + item)
+                    });
+                    return sortData;
+                }
+
+                function getSortDataCallback(sortField) {
+                    return function ($elem) {
+                        return parseInt($elem.attr(sortField), 10);
+                    }
+                }
+
+                function filterProducts(selector, url, callback) {
+                   // alert(selector);
+                    if (selector != null) {
+                        var filterCat = 'datasort' + selector.replace('.', '');
+
+                        $container.isotope({
+                            filter: selector,
+                            getSortData: getSortDataItems(),
+                            sortBy: filterCat
+                        });
+                    }
+
+                    //if (window.history && window.history.pushState) {
+                    //    window.history.pushState({}, "", url);
+                    //    //_gaq.push(['_trackPageview', url.replace(/^.*\/\/[^\/]+/, '')]);
+                    //}
+                }
+            }, //maccasApp.productpage
+
+            /* ------------------ */
+            // MACCASAPP.CONTENT TABS
+            /* ------------------ */
+
+            contenttabs: function () {
+
+                /* STICKY NAV */
+                //STICKY
+                if (mql600.matches) {
+                    $('#main-nav').sticky({
+                        topSpacing: 0,
+                        wrapperClassName: 'sticky-wrapper'
+                    });
+                }
+
+                if ($('#smartbanner').length) {
+                    $('body').addClass('app-dect');
+                }
+
+                if (mql768.matches) {
+                    $('#mobile-content-nav').sticky({
+                        topSpacing: 46,
+                        wrapperClassName: 'sticky-wrapper visible-xs'
+                    });
+
+                }
+
+                $('.contenttabs').find('.hero').hide();
+
+                if ($("ul.content-nav > li").length == 2) {
+                    $('ul.content-nav > li').addClass('twotabs');
+                };
+
+                if ($("ul.content-nav > li").length == 3) {
+                    $('ul.content-nav > li').addClass('threetabs');
+                };
+
+                if ($("ul.content-nav > li").length == 4) {
+                    $('ul.content-nav > li').addClass('fourtabs');
+                };
+
+                $(window).load(function () {
+
+                    // filter items when filter link is clicked
+                    $('.content-nav a').click(function () {
+                        var myEq = $(this).parent('li').index();
+
+                        if ($(this).attr("data-tab-redirect") == 1) {
+                            window.location.href = $(this).attr("href");
+                        } else {
+                            moveHeroSlider(myEq);
+                            if (window.history && window.history.pushState) {
+                                window.history.pushState({}, "", $(this).attr("href"));
+                                _gaq.push(['_trackPageview', $(this).attr("href").replace(/^.*\/\/[^\/]+/, '')]);
+                            }
+                        }
+                        return false;
+
+                    });
+
+                }); //window.load
+
+                $('.content-nav li a').click(function () {
+                    var $dataFilter = $(this).attr('data-filter');
+                    $('.content-nav li a').removeClass('active');
+                    $(this).addClass('active');
+
+                });
+
+
+
+                /* ****************************  FIX FOR NESTED FRAME  GALLERY *** */
+
+                $('.contenttabs').flexslider({
+                    animation: "fade",
+                    animationSpeed: 400,
+                    slideshow: false,
+                    touch: false,
+                    useCSS: false,
+                    smoothHeight: true,
+                    selector: '.slides > li',
+                    start: function (slider) {
+                        var myTab = $('.content-tabs ul li a.active').parent('li'),
+                            myEq = $('.content-tabs ul li').index(myTab);
+                        slider.flexslider(0);
+                        moveHeroSlider(myEq);
+
+                    },
+                    before: function (slider) {
+                        var nextSlide = slider.animatingTo,
+                            dataFilter = $('.contenttabs .item').eq(nextSlide).attr('data-filter');
+                        filterProducts(dataFilter);
+                    }
+                });
+
+                /* ****************************  FIX FOR NESTED FRAME  GALLERY *** */
+
+                $('#mobile-content-nav').flexslider({
+                    animation: "slide",
+                    slideshow: false,
+                    useCSS: false,
+                    minItems: 3,
+                    maxItems: 3,
+                    move: 1,
+                    itemWidth: 80,
+                    start: function () {
+                        //move mobile tab to active page
+                        var myTab = $('.content-tabs ul li a.active').parent('li');
+                        var myEq = $('.content-tabs ul li').index(myTab);
+                        moveNavSlider(myEq);
+                    },
+                    before: function (slider) {
+                        var nextSlide = slider.animatingTo;
+                        if (slider.attr("data-tab-redirect") == 1) {
+                            var myId = slider.attr('id'),
+                                myNxt = (nextSlide + 1),
+                                myHref = $('#' + myId + ' li:eq(' + myNxt + ') a').attr('href');
+                            if (window.location.href != myHref) {
+                                window.location.href = myHref
+                            }
+                        } else {
+                            moveHeroSlider(nextSlide);
+                        }
+                    }
+
+                });
+
+                $('#mobile-content-nav-container a.product-prev').on('click', function () {
+                    $('#mobile-content-nav').flexslider("prev");
+                    return false;
+                });
+                $('#mobile-content-nav-container a.product-next').on('click', function () {
+                    $('#mobile-content-nav').flexslider("next");
+                    return false;
+                });
+
+                $('#mobile-content-nav a').click(function () {
+                    return false;
+                });
+
+                //filter
+
+                function moveHeroSlider(goingTo) {
+                    $('.contenttabs').flexslider(goingTo);
+                    moveNavSlider(goingTo);
+                }
+
+                function moveNavSlider(goingTo) {
+                    $('#mobile-content-nav').flexslider(goingTo);
+                }
+
+                function filterProducts(selector) {
+                    $container.isotope({
+                        filter: selector
+                    });
+                }
+            }, //maccasApp.contenttabs
+
+            /* ------------------ */
+            // MACCASAPP.PRODUCTDETAILS
+            /* ------------------ */
+
+            productdetailspage: function () {
+
+                if (mql.matches) {
+                    //scroll the productDetailsNav
+                    $(window).scroll(
+                        function () {
+                            var winTop = $(window).scrollTop();
+
+                            if (winTop >= 250) {
+                                $('.product-details-section').fadeOut('400');
+                            } else {
+                                $('.product-details-section').fadeIn('400');
+                            }
+                        });
+                }
+
+                $(window).load(function () {
+                    $(".product").equalHeights();
+                    $(".product .thumbnail").equalHeights();
+
+                });
+
+                if (!$('.touch').length > 0) {
+                    $('.product').hover(
+                        function () {
+                            $(this).addClass('hover');
+                        },
+                        function () {
+                            $(this).removeClass('hover');
+                        }
+                    );
+                } //touch
+
+                $('#productDetailsNav a').not('#productDetailsNav.open a').on('click', function () {
+                    var $target = $(this).attr('data-tab');
+                    var $parent = $(this).parent('li');
+
+                    // console.log('target: '+$target);
+
+                    if ($parent.hasClass('open')) {
+                        $('#product-details-content').slideUp('400');
+                        $parent.removeClass('open');
+                        //$('.icon',this).toggleClass('icon-icon-angle-down icon-icon-angle-up');
+
+                        $('.tab-content').hide();
+
+                    } else {
+                        //$('.icon','.open').toggleClass('icon-icon-angle-down icon-icon-angle-up');
+                        $('.open', '#productDetailsNav').removeClass('open');
+
+                        $('.tab-content').hide();
+                        $('#' + $target).fadeIn();
+                        $('#product-details-content').slideDown('400');
+                        $parent.addClass('open');
+                        //$('.icon',this).toggleClass('icon-icon-angle-down icon-icon-angle-up');
+
+                        if ($target === 'product-nutrition-info') {
+                            // Nutrition Information TableCols
+                            $('#nutritional-info-slider').flexslider({
+                                animation: "slide",
+                                slideshow: false,
+                                animationLoop: false,
+                                useCSS: false,
+                                touch: false,
+                                start: function (slider) {
+                                    $('.product-size a', '.product-details-page').on('click', function () {
+                                        var myIndex = $(this, '.product-details-page .product-size').index(),
+                                            mySlideIndex = myIndex - 1;
+
+                                        $('.selected', '.product-size').removeClass('selected');
+                                        $(this).addClass('selected');
+
+                                        slider.flexAnimate(mySlideIndex);
+
+                                        return false;
+                                    });
+                                }
+                            });
+                        }
+                    };
+                    return false;
+                });
+
+                // var mql = window.matchMedia('only screen and (min-width: 320px) and (max-width: 767px)'),
+                //mqlO = window.matchMedia('(orientation: portrait)'),
+                var winHeight, contentHeight, slidesHeight;
+
+                //setHeight
+                if (mql.matches) {
+                    setHeight();
+
+                    //add orientation listener
+                    mqlO.addListener(function (m) {
+                        if (m.matches) {
+                            //changed to Portrait
+                            setHeight();
+                        } else {
+                            //changed to Landscape
+                            setHeight();
+                        };
+                    });
+                }
+
+                //calculate height 
+                function setHeight() {
+                    winHeight = $(window).height(),
+                        contentHeight = winHeight - 95,
+                        slidesHeight = contentHeight - 90;
+                    $('.slides').css({
+                        height: slidesHeight + 'px',
+                        overflowY: 'auto'
+                    });
+                    $('#product-allergen-info .product-content,#product-ingredients .product-content').css({
+                        height: (slidesHeight + 30) + 'px',
+                        overflowY: 'auto'
+                    });
+                    $('#product-details-content').css({
+                        height: contentHeight + 'px'
+                    });
+                }
+            }, //maccasApp.productdetailspage
+
+            carouselpage: function () {
+
+                $iframe = $("iframe[src^='//youtube.com']");
+
+                //gallery
+                $('.gallery2').not('.framegallery').each(function () {
+                    var $galleryId = $(this).attr('id');
+                    $('#' + $galleryId).flexslider({
+                        animation: "slide",
+                        slideshow: false,
+                        startAt: 1,
+                        controlsContainer: "#" + $galleryId,
+                        start: function (slider) {
+                            slider.flexslider(0);
+                            $('#' + $galleryId + ' .right').click(function (event) {
+                                slider.flexAnimate(slider.getTarget("next"));
+                                removeScale();
+                            });
+
+                            $('#' + $galleryId + ' .left').click(function (event) {
+                                slider.flexAnimate(slider.getTarget("prev"));
+                                removeScale();
+                            });
+
+                            if (mql.matches) {
+                                //mobile
+                            } else {
+                                //gallery click fix for inactive slides
+                                $('.item', '#' + $galleryId).append('<div class="noclick"></div>');
+
+                                $('.pane-video', '#' + $galleryId).append('<a href="#" class="closeBtn"><i class="icon icon-uniE602"></i></a>');
+
+                                $('.noclick').on('click', function (event) {
+                                    $activeParent = $(this).parent('.flex-active-slide');
+                                    $activeParent.addClass('scaleVideo');
+                                    return false;
+                                });
+
+                                $(document).click(function () {
+                                    if ($('ul.slides li').hasClass('scaleVideo')) {
+                                        removeScale();
+                                    }
+                                });
+
+                                $('.closeBtn', '.gallery2').click(function () {
+                                    removeScale();
+                                    return false;
+                                });
+                            }
+                        },
+
+                        before: function (slider) {
+                            removeScale();
+                        },
+
+                        after: function (slider) {
+                            $('.noclick', '#' + $galleryId).on('click', function (event) {
+                                if ($(this).parent().hasClass('clone')) {
+                                    $itemEq = $(this).parent('.item').index() - 1;
+                                    if ($itemEq < 0) {
+                                        $('.left', '#' + $galleryId).click();
+                                    } else {
+                                        $('.right', '#' + $galleryId).click();
+                                    }
+                                } else {
+                                    $itemEq = $(this).parent('.item').index() - 1;
+                                    $newItemEq = ($itemEq < 0) ? 0 : $itemEq;
+                                    $parentGallery = $(this).parents('.pane-gallery');
+                                    $parentGalleryId = $parentGallery.attr('id');
+                                    slider.flexAnimate($newItemEq);
+                                }
+                                return false;
+                            });
+                        }
+                    });
+                });
+
+                //frame gallery
+                $('.framegallery').each(function () {
+                    var $galleryId = $(this).attr('id');
+                    var $frameWrapper = $('.frame-wrapper', this);
+                    var dataViewport = ($frameWrapper.attr('data-viewport')).split(" ");
+                    var dataPadding = ($frameWrapper.attr('data-padding')).split(" ");
+
+                    //set Padding 
+                    if (mql.matches) {
+                        $frameWrapper.css({
+                            width: '100%',
+                            height: '100%'
+                        });
+                    } else {
+                        $frameWrapper.css({
+                            padding: dataPadding[0] + "px " + dataPadding[1] + "px " + dataPadding[2] + "px " + dataPadding[3] + "px",
+                            width: parseInt(dataPadding[1]) + parseInt(dataViewport[0]) + parseInt(dataPadding[3]) + 'px',
+                            height: parseInt(dataPadding[0]) + parseInt(dataViewport[1]) + parseInt(dataPadding[2]) + 'px'
+                        });
+                        $('.item', $frameWrapper).css({
+                            height: parseInt(dataViewport[1]) + 'px',
+                            marginBottom: 0
+                        });
+                    }
+
+                    $('#' + $galleryId + ' .frame-wrapper').flexslider({
+                        selector: ".frameslides > li",
+                        animation: "slide",
+                        slideshow: false,
+                        startAt: 1,
+                        controlsContainer: "#" + $galleryId,
+                        start: function (slider) {
+                            slider.flexslider(0);
+                            $('#' + $galleryId + ' .right').click(function (event) {
+                                slider.flexAnimate(slider.getTarget("next"));
+                            });
+                            $('#' + $galleryId + ' .left').click(function (event) {
+                                slider.flexAnimate(slider.getTarget("prev"));
+                            });
+                        }
+                    });
+                });
+
+
+
+                function removeScale() {
+                    $('.scaleVideo').removeClass('scaleVideo');
+                    pauseVideo();
+                }
+
+                function pauseVideo() {
+                    $iframe.each(function (i) {
+                        var func = 'pauseVideo';
+                        this.contentWindow.postMessage('{"event":"command","func":"' + func + '","args":""}', '*');
+                    });
+                }
+
+            }, //maccasApp.carouselpage
+
+            visibilityAction: function () {
+
+                var pane_visible_time = Drupal.settings.mcd.pane_visible_time;
+                var current_date = new Date();
+                var active_visible_time = '';
+                var available_time = ['morning', 'night', 'other'];
+                $.each(pane_visible_time, function (time_label, time_period) {
+                    if (time_label) {
+                        var time_from_to = time_period.split('-');
+
+                        var time_from = time_from_to[0].split(':');
+                        var time_from_hours = time_from[0];
+                        var time_from_minutes = time_from[1];
+
+                        var time_to = time_from_to[1].split(':');
+                        var time_to_hours = time_to[0];
+                        var time_to_minutes = time_to[1];
+
+                        var date_from = new Date();
+                        var date_to = new Date();
+
+                        date_from.setHours(time_from_hours, time_from_minutes, 0);
+                        date_to.setHours(time_to_hours, time_to_minutes, 0);
+
+                        if (date_from <= current_date && current_date <= date_to) {
+                            $('body').addClass('time-' + time_label);
+
+                            $(available_time).each(function (index, value) {
+                                if (time_label != value) {
+                                    $(".time-" + time_label + " li.visible-time-" + value).remove();
+                                }
+                            });
+                            return false;
+                        }
+                    }
+                });
+
+                // Get the current temperature.
+                var currTemp = Drupal.settings.mcd.weather_temp;
+                // Get the weather.
+                var weather = Drupal.settings.mcd.pane_visible_weather;
+                // Loop through all weather options.
+                $.each(weather, function (index, value) {
+                    // If the first part of the value is either > or <.
+                    if (value.substr(0, 1) == '<' || value.substr(0, 1) == '>') {
+                        // If this is a 'less than' equation.
+                        if (value.substr(0, 1) == '<') {
+                            // If the current temperature is less than x.
+                            if (currTemp < value.substr(1)) {
+                                // Add the class to the body.
+                                $('body').addClass('weather-' + index);
+                            }
+                        }
+                        // If this is a 'more than' equation.
+                        if (value.substr(0, 1) == '>') {
+                            // If the current temperature is more than x.
+                            if (currTemp > value.substr(1)) {
+                                // Add the class to the body.
+                                $('body').addClass('weather-' + index);
+                            }
+                        }
+                    }
+                });
+            }, //maccasApp.visibilityAction
+
+            mappage: function () {
+                //if (mql.matches) {
+                if ($('.page-template-find_us').length > 0) {
+                    $('body').addClass('openMapPanel');
+                    //OPEN MAP
+                    $('.mobile-right-nav #locate-nav-btn').bind('click', function () {
+                        $('body').toggleNavClass('openMapPanel');
+                        $('#locator-search .input-search').focus();
+                        return false;
+                    });
+                }
+                //}
+                //CLOSE MAP
+                $('.closeMapBar').on('click', function () {
+                    $('body').removeClass('openMapPanel');
+                    return false;
+                });
+
+                $('.mobile-mapInfo .mobile-btn-close').on('click', function () {
+                    $('.mobile-mapInfo').slideUp();
+                    return false;
+                });
+                //Map Panel
+
+                var $facilities = $('#facilities');
+
+                // $(window).load(function() {
+                // var facHeight = (ie)? $facilities.outerHeight() + 20 : $facilities.height(),
+                //     closedHeight = 15;
+
+                //     $facilities.attr('data-height',facHeight);
+                //     $facilities.attr('data-collapseheight',closedHeight);
+                //     $facilities.height(facHeight+'px');
+                //     $('.btn-collapse',$facilities).fadeIn();
+                // });
+
+                // Facilities 
+                $("#facilities .btn-collapse").bind("click", function () {
+                    toggleFacilities();
+                });
+
+                toggleFacilities = function () {
+                    var expHeight = $facilities.attr('data-height'),
+                        colHeight = $facilities.attr('data-collapseheight');
+
+                    $facilities.addClass('heightTrans');
+
+                    $facilities.toggleClass('open closed');
+                    if ($facilities.hasClass('open')) {
+                        $facilities.height(expHeight + 'px');
+                    } else {
+                        $facilities.height(colHeight + 'px');
+
+                    }
+
+                    resizeWindow();
+                }
+
+                closeFacilities = function () {
+                    var colHeight = $facilities.attr('data-collapseheight');
+                    $facilities.removeClass('open');
+                    $facilities.addClass('heightTrans closed');
+                    $facilities.height(colHeight + 'px');
+
+                    resizeWindow();
+                }
+
+                resizeWindow = function () {
+                    var $resCont = $('#result-container'),
+                        mapHeight = $('#map').height(),
+                        contHeight = $('#map-right-panel .varHeight').innerHeight(),
+                        navHeight = $('#main-nav').height(),
+                        footerHeight = $('#footer-wrapper').height(),
+                        openHeight,
+                        closedHeight;
+
+                    if (!mql.matches) {
+                        openHeight = mapHeight - (contHeight + navHeight + footerHeight);
+                        closedHeight = mapHeight - (contHeight + navHeight + footerHeight);
+                    }
+
+                    if ($facilities.hasClass('open')) {
+                        $resCont.css({
+                            height: openHeight
+                        });
+                    } else {
+                        $resCont.css({
+                            height: closedHeight
+                        });
+                    }
+                }
+            },
+            //maccasApp.mappage
+
+            /* ------------------ */
+            // MACCASAPP.MOBILE
+            /* ------------------ */
+
+            mobile: function () {
+                if (mql.matches) {
+                    $('body').addClass('mobile-site');
+                }
+
+                //OPEN SIDENAV
+                $('#sideNav-toggle').bind('click', function () {
+                    $('body').toggleNavClass('openSidenav');
+                    return false;
+                });
+
+                //CLOSE SIDENAV
+                $('.closeSideNav').bind('click', function () {
+                    $('body').removeClass('openSidenav');
+                    return false;
+                });
+
+                //OPEN SEARCH
+                $('.mobile-right-nav #search-btn').bind('click', function () {
+                    /* Act on the event */
+                    $('body').toggleNavClass('openSearchbar');
+                    $('#mobile-search-txt').focus();
+                    return false;
+                });
+
+                //CLOSE SEARCH
+                $('.closeSearchbar').bind('click', function () {
+                    $('body').removeClass('openSearchbar');
+                    return false;
+                });
+                //mobile wallet - cyt
+                if (mql.matches && $('.cyt-hub').length) {
+                    var googleWallet = $('.add-btn a.ctabtn:contains("google")');
+                    var appleWallet = $('.add-btn a.ctabtn:contains("apple")');
+                    /*Detects operating system of phone */
+                    var isMobile = {
+                        Android: function () {
+                            return navigator.userAgent.match(/Android/i);
+                        },
+                        iOS: function () {
+                            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+                        }
+                    };
+                    if (isMobile.Android()) {
+                        appleWallet.hide();
+                    } else if (isMobile.iOS()) {
+                        googleWallet.hide();
+                    };
+                }
+
+            }, //maccasapp.mobile
+
+            /*-------------------*/
+            // MACCASAPP.CYT
+            /*-------------------*/
+            cyt: function () {
+
+                var linkArray;
+                var navisShown;
+                var sliderObj = $('#parallax-slider');
+                var slidesObj = $('#parallax-slider ul.slides');
+                var listObj = slidesObj.find('li');
+                var totalSlides = listObj.length;
+                var footer_wrapper = $("#footer-wrapper");
+
+                //making menu always sticky to fix window resize
+                $('#main-nav').sticky({
+                    topSpacing: 0,
+                    wrapperClassName: 'sticky-wrapper'
+                });
+
+                //global slider things
+                if (sliderObj.length) {
+                    $('html,body').css({ overflow: 'hidden' });
+                }
+
+                linkArray = $.map(listObj, function (el) {
+                    return $(el).attr('data-name');
+                })
+
+                var is_nz = window.location.href.indexOf("nz") > -1;
+
+                //cyt home page finder
+                if ($('.your-burger').length) {
+                    sliderObj.append('<div class="restaurant-locator"><a href="/create-your-taste/restaurant-finder"><img src="/sites/all/themes/mcdonalds/images/themes/cyt/desktop-restaurant-finder' + (is_nz ? '-nz' : '') + '.gif" class="hidden-xs" /><img src="/sites/all/themes/mcdonalds/images/themes/cyt/mobile-restaurant-finder' + (is_nz ? '-nz' : '') + '.gif" class="visible-xs" /></a></div>');
+                    navisShown = true;
+                }
+
+                //cyt map page
+                if ($('.cyt-map').length) {
+                    $('.restaurant-finder .item-content').append('<div class="restaurant-locator"><img src="/sites/all/themes/mcdonalds/images/themes/cyt/desktop-restaurant-finder' + (is_nz ? '-nz' : '') + '.gif" class="hidden-xs" /><img src="/sites/all/themes/mcdonalds/images/themes/cyt/mobile-restaurant-finder' + (is_nz ? '-nz' : '') + '.gif" class="visible-xs" /></div>');
+                    $(".restaurant-locator").css({ 'opacity': 1, "position": "absolute", "top": "0" });
+                    navisShown = false;
+                }
+
+                // kiosk page
+                if ($('.fixed-slide').length) {
+                    //jens fix do not delete! - just commented out at this point 
+                    //$("#parallax-slider").prepend('<div class="kiosk-stand"><div class="fixed-kiosk kiosk-frame"><div class="inside-frame"></div><img src="/sites/all/themes/mcdonalds/images/themes/cyt/touchscreen-kiosk-frame.png" /></div></div>');   
+                    sliderObj.append('<div class="kiosk-frame"><img src="/sites/all/themes/mcdonalds/images/themes/cyt/touchscreen-kiosk-frame.png" /></div>');
+                    navisShown = true;
+                }
+                console.log(totalSlides);
+                // tooltips for fullpage.js
+                slidesObj.fullpage({
+                    navigation: navisShown,
+                    navigationPosition: 'right',
+                    navigationTooltips: linkArray,
+                    sectionSelector: 'li.item',
+                    scrollingSpeed: 1000,
+                    scrollOverflow: true,
+                    afterRender: function () {
+                        //map page
+                        if ($('.cyt-map').length) {
+                            if ($('.node-webform').is(':visible')) {
+                                $('.restaurant-locator').hide();
+                            }
+                            $('.mobile-arrow').remove();
+                        }
+                    },
+                    afterLoad: function (anchorLink, index) {
+
+                        //kiosk page
+                        if ($('.fixed-slide').length) {
+                            if (index >= 2) {//change for staging
+                                $('.kiosk-frame').addClass('fixed-kiosk');
+                            }
+                            if (index == totalSlides) {//change for staging
+                                $('.kiosk-frame').removeClass('fixed-kiosk');
+                            }
+                        }
+                        console.log(index);
+
+                    },
+                    onLeave: function (index, nextIndex, direction) {
+                        //kiosk page
+                        if ($('.fixed-slide').length) {
+                            // jens fix, dont delete! - just commented out at this point
+                            //$('.kiosk-frame .inside-frame').removeClass("slide" + index);
+                            //$('.kiosk-frame .inside-frame').addClass(("slide" + nextIndex), 2000, "easeInOutCubic");
+
+                            if (nextIndex == 1) {
+                                $('.kiosk-frame').removeClass('fixed-kiosk');
+                            }
+                            if (nextIndex == 2) {
+                                $('.kiosk-frame').addClass('fixed-kiosk');
+                            }
+                            if (nextIndex == totalSlides) {
+                                $('.kiosk-frame').removeClass('fixed-kiosk');
+                            }
+                        }
+                        if (nextIndex == totalSlides) {
+                            $('.mobile-arrow').css({ opacity: 0, height: 0 });
+                        }
+                        if (index == totalSlides) {
+                            $('.mobile-arrow').css({ opacity: 1, height: 'auto' });
+                        }
+
+
+
+                    }
+                });
+                footer_wrapper.appendTo("#parallax-slider li:last-child .inner-wrapper");
+                footer_wrapper.addClass("fixed-bottom");
+
+                $('.restaurant-finder .node-page').show();
+
+                sliderObj.find(".mobile-arrow").click(function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $.fn.fullpage.moveSectionDown();
+                });
+
+
+
+                $(document).on("ready", function () {
+                    if (mql.matches) {
+                        $('#fp-nav').remove();
+                    }
+                });
+                $('.other-restaurant').on('click', function () {
+                    var menuOffset = $('#main-nav');
+                    Drupal.cyt_search.hide_form();
+                    if (mql.matches) {
+                        setTimeout(function () {
+                            $.fn.fullpage.reBuild();
+                            $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: '100%' });
+                            Drupal.cyt_search.show_map();
+                            $('.fp-scrollable').animate({ scrollTop: 0 }, 150);
+                            $('.slimScrollBar').css({ top: 0 });
+                        }, 750)
+                    }
+                    else {
+                        $.fn.fullpage.reBuild();
+                        $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: '100%' });
+                        Drupal.cyt_search.show_map();
+                    }
+
+                });
+
+                // remove success messgae until submitted
+                if (location.search.search("success=1") != -1) {
+                    $('#webform-component-success').show();
+                    Drupal.cyt_search.hide_map();
+                    Drupal.cyt_search.show_form();
+                    $.fn.fullpage.moveTo(totalSlides);
+                    if (mql.matches) {
+                        $('#fp-nav').remove();
+                    }
+                }
+                else {
+                    $('#webform-component-success').hide();
+                }
+
+
+                //placeholder for map form
+                if ($('.cyt-search').length) {
+                    $('.cyt-search .views-exposed-form input[type="text"]').addClass('placeholder').attr('placeholder', 'Enter postcode or suburb').val('Enter postcode or suburb');
+
+                    $('.cyt-search .views-exposed-form input[type="text"]').click(function () {
+
+                        if ($(this).val() == $(this).attr('placeholder')) {
+                            $(this).val("");
+                        }
+                    });
+                }
+
+                $(document).on('ajaxComplete ready', function () {
+                    // mobile map listings
+                    var listItem = $(".flexslider");
+                    var bottomPos = (-1 * footer_wrapper.position().top) + footer_wrapper.outerHeight() - 14;
+                    if (mql.matches) {
+                        setTimeout(function () {
+                            listItem.css({ "bottom": bottomPos });
+                        }, 750);
+                    }
+                    $('.accordion-content').hide();
+                    $('.listing-inner').on('click', function () {
+                        var parent = $('.slides>li');
+                        parent.toggleClass('open');
+                        $('.flex-direction-nav').toggleClass('open');
+                        parent.find('.accordion-content').slideToggle({
+                            duration: 300,
+                            step: function () {
+                                var accContentH = $(this).outerHeight();
+                                if (mql.matches) {
+                                    if ($('.accordion-content').is(':visible')) {
+                                        listItem.css({ bottom: bottomPos + accContentH });
+                                    }
+                                    else {
+                                        listItem.css({ bottom: bottomPos });
+                                    }
+                                }
+                            }
+                        });
+
+                    });
+                    //carousel for multiple map results
+                    $('.flexslider').flexslider({
+                        animation: "slide",
+                        slideshow: false,
+                        controlNav: false,
+                        after: function (slider) {
+                            Drupal.cyt_search.move_map(slider.currentSlide);
+                            $(window).on('resize', function () {
+                                setTimeout(function () {
+                                    Drupal.cyt_search.move_map(slider.currentSlide);
+                                }, 100);
+                            });
+                        }
+                    });
+
+                    //fancy checkboxes for stay tuned form
+                    $('.cyt .node-webform').find('input[type="checkbox"]').change(function () {
+                        var $label = $('label[for="' + this.id + '"]');
+                        if ($(this).is(':checked')) {
+                            $label.removeClass('iserror')
+                            $label.addClass('ischecked');
+                        }
+                        else {
+                            $label.removeClass('ischecked');
+                        }
+                    });
+
+                    //default checked for first checkbox
+                    $('.cyt .node-webform #edit-submitted-proximity-optin-1').attr('checked', 'checked').change();
+
+                    //fix return key error for ie8
+                    $('#edit-field-cyt-coverage-value').keypress(function (e) {
+                        if (e.keyCode == 13) {
+                            e.preventDefault();
+                            $('#edit-submit-cyt-search').trigger('click');
+                        }
+                    });
+
+                    //making plugin resize
+                    if ($('.node-webform').is(':visible')) {
+                        if (mql.matches) {
+                            setTimeout(function () {
+                                $.fn.fullpage.reBuild();
+                            }, 750)
+                        }
+                        else {
+                            $.fn.fullpage.reBuild();
+                        }
+                        if ($('.fp-scrollable').length) {
+                            $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: 'auto' })
+                        }
+                        else {
+                            $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: '100%' })
+                        }
+                    }
+
+                });
+                $(window).on('resize load', function () {
+                    if ($('.node-webform').is(':visible')) {
+                        var timer = 0;
+                        timer = setTimeout(function () {
+                            if ($('.fp-scrollable').length) {
+                                $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: 'auto' });
+                            }
+                            else { $('.restaurant-finder .inner-wrapper, .restaurant-finder .item-content').css({ height: '100%' }); }
+                        }, 500);
+                    }
+                });
+
+            },//maccasApp.cyt
+
+            /**
+             * handling custom js in junior sport app page.
+             */
+            junior_sport_application_form: function () {
+                var max_cost_items = 30;
+                var min_cost_items = 6;
+
+                for (var i = min_cost_items; i <= max_cost_items; i++) {
+                    if ($("#webform-component-item-list--item" + i).length) {
+                        $("#webform-component-item-list--item" + i).hide();
+                        $("#webform-component-cost-list--cost" + i).hide();
+                    }
+                }
+
+                $("#webform-component-cost-list--add-more-cost").click(function (e) {
+                    e.preventDefault();
+                    if ($("[id^=webform-component-item-list--item]:hidden:first").length) {
+                        $("[id^=webform-component-item-list--item]:hidden:first").show();
+                        $("[id^=webform-component-cost-list--cost]:hidden:first").show();
+                    }
+
+                    // if there's no more cost list left, we hide the button
+                    if (!$("[id^=webform-component-item-list--item]:hidden:first").length) {
+                        $(this).hide();
+                    }
+                });
+            }
+
+        }; //maccasApp
+}(jQuery));
